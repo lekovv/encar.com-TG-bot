@@ -1,0 +1,60 @@
+import sbt.*
+
+object Dependencies {
+
+  object Version {
+    val scala        = "2.13.10"
+    val zio          = "2.1.15"
+    val zioHttp      = "3.0.1"
+    val zioConfig    = "4.0.3"
+    val sl4j         = "2.0.16"
+    val zioLogging   = "2.3.1"
+    val logback      = "1.5.8"
+    val scalaLogging = "3.9.5"
+    val bot4s        = "5.7.0"
+  }
+
+  object ZIO {
+    lazy val core   = "dev.zio" %% "zio"        % Version.zio
+    lazy val macros = "dev.zio" %% "zio-macros" % Version.zio
+  }
+
+  object LOGS {
+    lazy val sl4j           = "org.slf4j"                   % "slf4j-api"          % Version.sl4j
+    lazy val logback        = "ch.qos.logback"              % "logback-classic"    % Version.logback
+    lazy val zioLogging     = "dev.zio"                    %% "zio-logging"        % Version.zioLogging
+    lazy val zioLoggingLf4j = "dev.zio"                    %% "zio-logging-slf4j2" % Version.zioLogging
+    lazy val scalaLogging   = "com.typesafe.scala-logging" %% "scala-logging"      % Version.scalaLogging
+  }
+
+  object HTTP {
+    lazy val zhttp = "dev.zio" %% "zio-http" % Version.zioHttp
+  }
+
+  object CONFIG {
+    lazy val core     = "dev.zio" %% "zio-config"          % Version.zioConfig
+    lazy val magnolia = "dev.zio" %% "zio-config-magnolia" % Version.zioConfig
+    lazy val typesafe = "dev.zio" %% "zio-config-typesafe" % Version.zioConfig
+    lazy val refined  = "dev.zio" %% "zio-config-refined"  % Version.zioConfig
+  }
+
+  object TELEGRAM {
+    lazy val bot4S = "com.bot4s" %% "telegram-core" % Version.bot4s
+  }
+
+  lazy val globalProjectDependencies = Seq(
+    ZIO.core,
+    ZIO.macros,
+    LOGS.scalaLogging,
+    LOGS.logback,
+    LOGS.zioLoggingLf4j,
+    LOGS.zioLogging,
+    LOGS.sl4j,
+    HTTP.zhttp,
+    CONFIG.typesafe,
+    CONFIG.refined,
+    CONFIG.magnolia,
+    CONFIG.core,
+    TELEGRAM.bot4S
+  )
+}
