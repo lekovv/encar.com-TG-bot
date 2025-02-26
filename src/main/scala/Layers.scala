@@ -1,8 +1,9 @@
 import _root_.config.ConfigApp
+import telegram.{TGBot, TGBotClient}
 import zio._
+import zio.http.Server
 import zio.http.netty.NettyConfig
 import zio.http.netty.NettyConfig.LeakDetectionLevel
-import zio.http.{Client, Server}
 
 object Layers {
 
@@ -19,15 +20,11 @@ object Layers {
 
   private lazy val server = (serverConf ++ nettyConf) >>> Server.customized
 
-  private val runtime = Scope.default
-
   private val base = ConfigApp.live
 
-  private val client = Client.default
-
   val all =
-    runtime >+>
-      base >+>
-      client >+>
-      server
+    base >+>
+      server >+>
+      TGBotClient.live >+>
+      TGBot.live
 }

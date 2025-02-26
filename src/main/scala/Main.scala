@@ -1,3 +1,4 @@
+import telegram.TGBot
 import zio.Console.printLine
 import zio.Runtime.setConfigProvider
 import zio._
@@ -14,7 +15,8 @@ object Main extends ZIOAppDefault {
 
   private val program =
     for {
-      _ <- ZIO.logInfo("Server is running")
+      _ <- ZIO.logInfo("Bot is running")
+      _ <- ZIO.serviceWithZIO[TGBot](_.run)
     } yield ()
 
   override def run =
