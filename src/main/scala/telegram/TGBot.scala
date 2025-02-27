@@ -1,14 +1,15 @@
 package telegram
 
+import config.ConfigApp
+import zio.RIO
 import zio.macros.accessible
-import zio.{Task, ZLayer}
 
 @accessible
 trait TGBot {
 
-  def run: Task[Unit]
+  def run: RIO[ConfigApp, Unit]
 }
 
 object TGBot {
-  val live: ZLayer[TGBotClient, Nothing, TGBotLive] = TGBotLive.layer
+  val live = TGBotLive.layer
 }

@@ -1,13 +1,13 @@
 package telegram
 
-import com.bot4s.telegram.api.declarative.{Callbacks, Commands}
-import com.bot4s.telegram.cats.{Polling, TelegramBot}
-import config.ConfigApp
+import _root_.config.ConfigApp
+import com.bot4s.telegram.api.declarative._
+import com.bot4s.telegram.cats._
 import org.asynchttpclient.Dsl.asyncHttpClient
 import sttp.client3.asynchttpclient.zio.AsyncHttpClientZioBackend
 import util.Secret.SecretOps
+import zio._
 import zio.interop.catz._
-import zio.{Task, ZIO, ZLayer}
 
 case class TGBotClient(token: String) extends TelegramBot[Task](
       token,
@@ -15,6 +15,7 @@ case class TGBotClient(token: String) extends TelegramBot[Task](
     )
     with Polling[Task]
     with Commands[Task]
+    with RegexCommands[Task]
     with Callbacks[Task]
 
 object TGBotClient {

@@ -1,4 +1,5 @@
 import _root_.config.ConfigApp
+import telegram.scenario.TGScenario
 import telegram.{TGBot, TGBotClient}
 import zio._
 import zio.http.Server
@@ -26,5 +27,6 @@ object Layers {
     base >+>
       server >+>
       TGBotClient.live >+>
+      TGScenario.live >+>
       TGBot.live
 }

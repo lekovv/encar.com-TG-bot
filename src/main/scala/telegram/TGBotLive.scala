@@ -1,19 +1,26 @@
 package telegram
 
-import zio.{Task, ZIO, ZLayer}
+import config.ConfigApp
+import telegram.scenario.TGScenario
+import zio.{RIO, ZIO, ZLayer}
 
-final case class TGBotLive(bot: TGBotClient) extends TGBot {
+final case class TGBotLive(
+    client: TGBotClient,
+    listener: TGScenario[TGBotClient]
+) extends TGBot {
 
-  override def run: Task[Unit] =
+  override def run: RIO[ConfigApp, Unit] =
     for {
-      _ <- bot.startPolling()
+      _ <- listener.listen(client)
+      _ <- client.startPolling()
     } yield ()
 }
 
 object TGBotLive {
-  val layer: ZLayer[TGBotClient, Nothing, TGBotLive] = ZLayer.fromZIO {
+  val layer = ZLayer.fromZIO {
     for {
-      client <- ZIO.service[TGBotClient]
-    } yield TGBotLive(client)
+      client   <- ZIO.service[TGBotClient]
+      listener <- ZIO.service[TGScenario[TGBotClient]]
+    } yield TGBotLive(client, listener)
   }
 }

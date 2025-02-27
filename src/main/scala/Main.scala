@@ -16,10 +16,10 @@ object Main extends ZIOAppDefault {
   private val program =
     for {
       _ <- ZIO.logInfo("Bot is running")
-      _ <- ZIO.serviceWithZIO[TGBot](_.run)
-    } yield ()
+      bot <- ZIO.serviceWithZIO[TGBot](_.run).exitCode
+    } yield bot
 
-  override def run =
+  override def run: ZIO[Any, Nothing, ExitCode] =
     program
       .provide(Layers.all)
       .foldZIO(
