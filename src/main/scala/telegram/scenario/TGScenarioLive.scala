@@ -1,7 +1,8 @@
 package telegram.scenario
 
 import cats.implicits.toFunctorOps
-import com.bot4s.telegram.models.{InlineKeyboardButton, InlineKeyboardMarkup}
+import com.bot4s.telegram.methods.EditMessageText
+import com.bot4s.telegram.models.{ChatId, InlineKeyboardButton, InlineKeyboardMarkup}
 import telegram.TGBotClient
 import zio.interop.catz.asyncInstance
 import zio.{Task, ZIO, ZLayer}
@@ -19,13 +20,31 @@ final case class TGScenarioLive() extends TGScenario[TGBotClient] {
     bot.onMessage { implicit msg =>
       val text = msg.text.getOrElse("")
       if (text.startsWith("https://fem.encar.com/")) {
+
         val cancelButton = InlineKeyboardButton.callbackData("Отменить", "cancel")
         val markup       = InlineKeyboardMarkup.singleColumn(Seq(cancelButton))
 
-        bot.replyMd("Идет просчет стоимости, пожалуйста, ожидайте...", replyMarkup = Option(markup)).void
+        bot.replyMd("Идет расчет стоимости, пожалуйста, ожидайте...", replyMarkup = Option(markup)).void
       } else if (text.nonEmpty && text != "/start") {
         bot.reply("Пожалуйста, отправьте корректную ссылку с сайта encar.com").void
       } else ZIO.unit
+    }
+
+    bot.onCallbackWithTag("cancel") { implicit cbq =>
+      for {
+        _   <- ZIO.unit
+        ack <- bot.ackCallback(Option(cbq.from.firstName + " отменил расчет")).fork
+        response <- bot
+          .request(
+            EditMessageText(
+              Option(ChatId(cbq.message.get.source)),
+              Option(cbq.message.get.messageId),
+              text = "Расчет отменен"
+            )
+          )
+          .fork
+        _ <- ack.zip(response).join
+      } yield ()
     }
   }
 }
