@@ -1,4 +1,6 @@
 import _root_.config.ConfigApp
+import service.calculate.Calculate
+import service.parser.Parser
 import telegram.scenario.TGScenario
 import telegram.{TGBot, TGBotClient}
 import zio._
@@ -27,6 +29,8 @@ object Layers {
     base >+>
       server >+>
       TGBotClient.live >+>
+      Parser.live >+>
+      Calculate.live >+>
       TGScenario.live >+>
       TGBot.live
 }

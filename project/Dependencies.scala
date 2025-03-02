@@ -15,6 +15,7 @@ object Dependencies {
     val sttp         = "3.9.0"
     val zioCats      = "23.1.0.0"
     val catsEffect   = "3.4.8"
+    val jsoup        = "1.18.3"
   }
 
   object ZIO {
@@ -40,6 +41,10 @@ object Dependencies {
     lazy val sttp  = "com.softwaremill.sttp.client3" %% "async-http-client-backend-zio" % Version.sttp
   }
 
+  object JSOUP {
+    lazy val core = "org.jsoup" % "jsoup" % Version.jsoup
+  }
+
   object CONFIG {
     lazy val core     = "dev.zio" %% "zio-config"          % Version.zioConfig
     lazy val magnolia = "dev.zio" %% "zio-config-magnolia" % Version.zioConfig
@@ -63,6 +68,7 @@ object Dependencies {
     LOGS.sl4j,
     HTTP.zhttp,
     HTTP.sttp,
+    JSOUP.core,
     CONFIG.typesafe,
     CONFIG.refined,
     CONFIG.magnolia,

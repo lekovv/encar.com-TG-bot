@@ -1,19 +1,17 @@
 package telegram.scenario
 
 import cats.implicits.toFunctorOps
-import com.bot4s.telegram.methods.{EditMessageText, SendMessage}
-import com.bot4s.telegram.models.{ChatId, InlineKeyboardButton, InlineKeyboardMarkup}
+import com.bot4s.telegram.methods.ParseMode.Markdown
+import com.bot4s.telegram.methods.{EditMessageText, SendMessage, SendPhoto}
+import com.bot4s.telegram.models.{ChatId, InlineKeyboardButton, InlineKeyboardMarkup, InputFile}
+import models.CarPrice
+import service.calculate.Calculate
 import telegram.TGBotClient
 import zio.interop.catz.asyncInstance
 import zio.{Task, ZIO, ZLayer}
 
-final case class TGScenarioLive() extends TGScenario[TGBotClient] {
+final case class TGScenarioLive(calc: Calculate) extends TGScenario[TGBotClient] {
 
-  // TODO: вывести метод для расчета в отдельный файл, создать модель данных и возвращать ее
-  private def calculate(url: String): Task[String] = ZIO.attempt {
-    Thread.sleep(5000)
-    "Стоимость автомобиля: тебе бесплатно, брат"
-  }
   override def listen(bot: TGBotClient): Task[Unit] = ZIO.attempt {
 
     bot.onMessage { implicit msg =>
@@ -32,16 +30,22 @@ final case class TGScenarioLive() extends TGScenario[TGBotClient] {
                 replyMarkup = Option(cancelMarkup)
               )
             )
-          _ <- calculate(url)
+          _ <- calc
+            .calculate(url)
             .foldZIO(
               err => bot.reply(s"Произошла ошибка при расчете стоимости $err").void,
-              cost =>
-                bot.request(
-                  SendMessage(
-                    ChatId(msg.source),
-                    text = s"$cost"
+              { case CarPrice(image, model, mileage, year, desc) =>
+                for {
+                  _ <- bot.request(
+                    SendPhoto(
+                      chatId = ChatId(msg.source),
+                      photo = InputFile(image),
+                      caption = Option(s"*Модель:* $model\n*Пробег:* $mileage\n*Год выпуска:* $year\n*Описание:* $desc"),
+                      parseMode = Option(Markdown)
+                    )
                   )
-                )
+                } yield ()
+              }
             )
             .fork
         } yield ()
@@ -73,5 +77,9 @@ final case class TGScenarioLive() extends TGScenario[TGBotClient] {
 }
 
 object TGScenarioLive {
-  val layer = ZLayer.fromFunction(TGScenarioLive.apply _)
+  val layer = ZLayer.fromZIO {
+    for {
+      calc <- ZIO.service[Calculate]
+    } yield TGScenarioLive(calc)
+  }
 }
