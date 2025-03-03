@@ -15,7 +15,7 @@ object Dependencies {
     val sttp         = "3.9.0"
     val zioCats      = "23.1.0.0"
     val catsEffect   = "3.4.8"
-    val jsoup        = "1.18.3"
+    val selenium     = "4.6.0"
   }
 
   object ZIO {
@@ -41,8 +41,9 @@ object Dependencies {
     lazy val sttp  = "com.softwaremill.sttp.client3" %% "async-http-client-backend-zio" % Version.sttp
   }
 
-  object JSOUP {
-    lazy val core = "org.jsoup" % "jsoup" % Version.jsoup
+  object SELENIUM {
+    lazy val core   = "org.seleniumhq.selenium" % "selenium-java"          % Version.selenium
+    lazy val driver = "org.seleniumhq.selenium" % "selenium-chrome-driver" % Version.selenium
   }
 
   object CONFIG {
@@ -68,7 +69,8 @@ object Dependencies {
     LOGS.sl4j,
     HTTP.zhttp,
     HTTP.sttp,
-    JSOUP.core,
+    SELENIUM.core,
+    SELENIUM.driver,
     CONFIG.typesafe,
     CONFIG.refined,
     CONFIG.magnolia,
