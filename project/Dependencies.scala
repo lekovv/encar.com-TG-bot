@@ -16,12 +16,19 @@ object Dependencies {
     val zioCats      = "23.1.0.0"
     val catsEffect   = "3.4.8"
     val selenium     = "4.6.0"
+    val circe        = "0.14.2"
   }
 
   object ZIO {
     lazy val core   = "dev.zio" %% "zio"              % Version.zio
     lazy val macros = "dev.zio" %% "zio-macros"       % Version.zio
     lazy val cats   = "dev.zio" %% "zio-interop-cats" % Version.zioCats
+  }
+
+  object CIRCE {
+    lazy val core    = "io.circe" %% "circe-core"    % Version.circe
+    lazy val generic = "io.circe" %% "circe-generic" % Version.circe
+    lazy val parse   = "io.circe" %% "circe-parser"  % Version.circe
   }
 
   object CATS {
@@ -61,6 +68,9 @@ object Dependencies {
     ZIO.core,
     ZIO.macros,
     ZIO.cats,
+    CIRCE.core,
+    CIRCE.generic,
+    CIRCE.parse,
     CATS.catsEffect,
     LOGS.scalaLogging,
     LOGS.logback,

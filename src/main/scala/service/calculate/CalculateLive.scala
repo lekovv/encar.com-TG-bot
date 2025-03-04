@@ -9,7 +9,15 @@ final case class CalculateLive(parser: Parser) extends Calculate {
   override def calculate(url: String): Task[CarPrice] = {
     for {
       data <- parser.parseHTML(url)
-      cost = CarPrice(data.image, data.model, data.mileage, data.year, desc = "test description")
+      cost = CarPrice(
+        data.image,
+        data.model,
+        data.mileage + " км",
+        data.capacity + " л",
+        data.prodYear,
+        price = data.price + " (переведем в рубли и добавим таможенные расходы)",
+        desc = "test description"
+      )
     } yield cost
   }
 }

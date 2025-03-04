@@ -1,53 +1,149 @@
 package service.parser
+import io.circe.Json
+import io.circe.parser._
 import models.CarInfo
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
+import org.openqa.selenium.safari.{SafariDriver, SafariOptions}
+import org.openqa.selenium.{By, WebDriver}
 import zio.{Task, ZIO, ZLayer}
 
-//TODO: разобраться с подключением chromedriver (403)
+import java.time.Duration
+
 final case class ParserLive() extends Parser {
 
   override def parseHTML(url: String): Task[CarInfo] = ZIO.attempt {
 
-    val options = new ChromeOptions()
-//    options.addArguments("--headless")
-    options.addArguments("--disable-extensions")
+    val options           = new SafariOptions()
+    val driver: WebDriver = new SafariDriver(options)
 
-//    val service: ChromeDriverService = new ChromeDriverService.Builder().usingPort(8080).build()
-    val driver: WebDriver = new ChromeDriver(options)
-//    driver.manage().timeouts().implicitlyWait(Duration.ofMillis(10000))
+    try {
+      driver.manage().timeouts().implicitlyWait(Duration.ofMillis(3000))
+      driver.get(url)
 
-    CarInfo(
-      image = "https://ci.encar.com/carpicture/carpicture02/pic3892/38926760_001.jpg",
-      model = "BMW",
-      mileage = "0",
-      year = "2022.11"
-    )
+      val script = driver
+        .findElement(By.xpath("//script[contains(text(), 'PRELOADED_STATE')]"))
+        .getAttribute("innerHTML")
+
+      val json = script
+        .replaceAll("__PRELOADED_STATE__ = ", "")
+        .trim
+
+      val body = parse(json) match {
+        case Right(value) => value
+        case Left(err)    => throw new Exception(s"failed to parse json: $err")
+      }
+
+      val image = body.hcursor
+        .downField("cars")
+        .downField("base")
+        .downField("photos")
+        .as[List[Json]] match {
+        case Right(photos) =>
+          photos.find(
+            _.hcursor
+              .downField("code")
+              .as[String]
+              .getOrElse("") == "001"
+          ) match {
+            case Some(value) =>
+              val path = value.hcursor
+                .downField("path")
+                .as[String]
+                .getOrElse("")
+              s"https://ci.encar.com/carpicture${path}"
+            case None => throw new Exception("photo with code 001 not found")
+          }
+        case Left(err) => throw new Exception(s"failed to get image: $err")
+      }
+
+      val manufacturerEnglishName = body.hcursor
+        .downField("cars")
+        .downField("base")
+        .downField("category")
+        .downField("manufacturerEnglishName")
+        .as[String] match {
+        case Right(value) => value
+        case Left(err)    => throw new Exception(s"failed to get manufacturerEnglishName: $err")
+      }
+
+      val modelGroupEnglishName = body.hcursor
+        .downField("cars")
+        .downField("base")
+        .downField("category")
+        .downField("modelGroupEnglishName")
+        .as[String] match {
+        case Right(value) => value
+        case Left(err)    => throw new Exception(s"failed to get modelGroupEnglishName: $err")
+      }
+
+      val gradeEnglishName = body.hcursor
+        .downField("cars")
+        .downField("base")
+        .downField("category")
+        .downField("gradeEnglishName")
+        .as[String] match {
+        case Right(value) => value
+        case Left(err)    => throw new Exception(s"failed to get gradeEnglishName: $err")
+      }
+
+      val mileage = body.hcursor
+        .downField("cars")
+        .downField("base")
+        .downField("spec")
+        .downField("mileage")
+        .as[Int] match {
+        case Right(value) => value
+        case Left(err)    => throw new Exception(s"failed to get mileage: $err")
+      }
+
+      val displacement = body.hcursor
+        .downField("cars")
+        .downField("base")
+        .downField("spec")
+        .downField("displacement")
+        .as[Int] match {
+        case Right(value) => value.toString
+        case Left(err)    => throw new Exception(s"failed to get displacement: $err")
+      }
+
+      val engineCapacity = s"${displacement.charAt(0)}.${displacement.substring(1)}".toDouble
+
+      val priceWon = body.hcursor
+        .downField("cars")
+        .downField("base")
+        .downField("advertisement")
+        .downField("price")
+        .as[Long] match {
+        case Right(value) => value * 10000
+        case Left(err)    => throw new Exception(s"failed to get price: $err")
+      }
+
+      val yearMonth = body.hcursor
+        .downField("cars")
+        .downField("base")
+        .downField("category")
+        .downField("yearMonth")
+        .as[String] match {
+        case Right(value) => value
+        case Left(err)    => throw new Exception(s"failed to get yearMonth: $err")
+      }
+
+      val year  = yearMonth.substring(0, 4)
+      val month = yearMonth.substring(4, 6)
+
+      CarInfo(
+        image = s"$image",
+        model = s"$manufacturerEnglishName $modelGroupEnglishName $gradeEnglishName",
+        mileage = mileage,
+        capacity = engineCapacity,
+        prodYear = s"$month.$year",
+        price = priceWon
+      )
+
+    } finally {
+      driver.quit()
+    }
+
   }
-  /* скрипт: __PRELOADED_STATE__
-  путь для фотографии: cars \ base \ photos(массив)
-  в нем ориентироваться на поле code = 001
-  к переменной path добавлять https://ci.encar.com/carpicture для формирования полной ссылки на фотографию
-   */
-
-  /*
-  путь для параметров машины: cars \ base \ category
-  "manufacturerName": "BMW"
-  "modelGroupEnglishName": "5-Series"
-  "gradeEnglishName": "523d M Sport"
-   */
-
-  /*
-  путь для цены: cars \ base \ advertisement \ price (нужно умножить на 10 000)
-   */
-
-  /*
-  путь для пробега: cars \ base \ spec \ mileage
-   */
-
-  /*
-  найти объем двигателя
-   */
 }
 
 object ParserLive {

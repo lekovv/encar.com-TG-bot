@@ -34,13 +34,15 @@ final case class TGScenarioLive(calc: Calculate) extends TGScenario[TGBotClient]
             .calculate(url)
             .foldZIO(
               err => bot.reply(s"Произошла ошибка при расчете стоимости $err").void,
-              { case CarPrice(image, model, mileage, year, desc) =>
+              { case CarPrice(image, model, mileage, capacity, prodYear, price, desc) =>
                 for {
                   _ <- bot.request(
                     SendPhoto(
                       chatId = ChatId(msg.source),
                       photo = InputFile(image),
-                      caption = Option(s"*Модель:* $model\n*Пробег:* $mileage\n*Год выпуска:* $year\n*Описание:* $desc"),
+                      caption = Option(
+                        s"*Модель:* $model\n*Пробег:* $mileage\n*Объем двигателя:* $capacity\n*Год выпуска:* $prodYear\n*Стоимость автомобиля:* $price\n*Описание:* $desc"
+                      ),
                       parseMode = Option(Markdown)
                     )
                   )
