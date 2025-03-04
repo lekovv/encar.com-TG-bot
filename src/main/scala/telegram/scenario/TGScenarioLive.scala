@@ -41,7 +41,14 @@ final case class TGScenarioLive(calc: Calculate) extends TGScenario[TGBotClient]
                       chatId = ChatId(msg.source),
                       photo = InputFile(image),
                       caption = Option(
-                        s"*Модель:* $model\n*Пробег:* $mileage\n*Объем двигателя:* $capacity\n*Год выпуска:* $prodYear\n*Стоимость автомобиля:* $price\n*Описание:* $desc"
+                        s"""*Модель:* *$model*
+                           |*Пробег:* *$mileage*
+                           |*Объем двигателя:* *$capacity*
+                           |*Год выпуска:* *$prodYear*
+                           |*Стоимость автомобиля:* *$price*
+                           |
+                           |*Описание:* $desc
+                         """.stripMargin
                       ),
                       parseMode = Option(Markdown)
                     )

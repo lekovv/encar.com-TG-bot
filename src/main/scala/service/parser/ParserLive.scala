@@ -142,7 +142,6 @@ final case class ParserLive() extends Parser {
     } finally {
       driver.quit()
     }
-
   }
 }
 
