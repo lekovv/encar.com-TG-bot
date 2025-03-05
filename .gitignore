@@ -1,5 +1,7 @@
 hs_err_pid*
 
+.env
+
 *.iml
 *.ipr
 *.iws

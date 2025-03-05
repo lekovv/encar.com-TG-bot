@@ -2,21 +2,27 @@ package service.parser
 import io.circe.Json
 import io.circe.parser._
 import models.CarInfo
-import org.openqa.selenium.safari.{SafariDriver, SafariOptions}
-import org.openqa.selenium.{By, WebDriver}
+import org.openqa.selenium.By
+import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.remote.RemoteWebDriver
 import zio.{Task, ZIO, ZLayer}
 
+import java.net.URL
 import java.time.Duration
+
 
 final case class ParserLive() extends Parser {
 
   override def parseHTML(url: String): Task[CarInfo] = ZIO.attempt {
 
-    val options           = new SafariOptions()
-    val driver: WebDriver = new SafariDriver(options)
+    val gridUrl = new URL("http://selenium-standalone-chromium:4444/wd/hub")
+
+    val options = new ChromeOptions()
+    options.addArguments("--headless")
+    val driver: RemoteWebDriver = new RemoteWebDriver(gridUrl, options)
 
     try {
-      driver.manage().timeouts().implicitlyWait(Duration.ofMillis(5000))
+      driver.manage().timeouts().implicitlyWait(Duration.ofMillis(3000))
       driver.get(url)
 
       val script = driver
