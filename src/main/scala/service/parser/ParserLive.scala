@@ -16,7 +16,7 @@ final case class ParserLive() extends Parser {
     val driver: WebDriver = new SafariDriver(options)
 
     try {
-      driver.manage().timeouts().implicitlyWait(Duration.ofMillis(3000))
+      driver.manage().timeouts().implicitlyWait(Duration.ofMillis(5000))
       driver.get(url)
 
       val script = driver
@@ -135,7 +135,7 @@ final case class ParserLive() extends Parser {
         model = s"$manufacturerEnglishName $modelGroupEnglishName $gradeEnglishName",
         mileage = mileage,
         capacity = engineCapacity,
-        prodYear = s"$month.$year",
+        prodYear = s"01.$month.$year",
         price = priceWon
       )
 

@@ -34,26 +34,51 @@ final case class TGScenarioLive(calc: Calculate) extends TGScenario[TGBotClient]
             .calculate(url)
             .foldZIO(
               err => bot.reply(s"Произошла ошибка при расчете стоимости $err").void,
-              { case CarPrice(image, model, mileage, capacity, prodYear, price, desc) =>
-                for {
-                  _ <- bot.request(
-                    SendPhoto(
-                      chatId = ChatId(msg.source),
-                      photo = InputFile(image),
-                      caption = Option(
-                        s"""*Модель:* *$model*
-                           |*Пробег:* *$mileage*
-                           |*Объем двигателя:* *$capacity*
-                           |*Год выпуска:* *$prodYear*
-                           |*Стоимость автомобиля:* *$price*
+              {
+                case CarPrice(
+                      image,
+                      model,
+                      mileage,
+                      capacity,
+                      prodYear,
+                      price,
+                      customExp,
+                      utilFee,
+                      addExp,
+                      total,
+                      desc,
+                      phone,
+                      addInfo
+                    ) =>
+                  for {
+                    _ <- bot.request(
+                      SendPhoto(
+                        chatId = ChatId(msg.source),
+                        photo = InputFile(image),
+                        caption = Option(
+                          s"""Модель: *$model*
+                           |Пробег: *$mileage*
+                           |Объем двигателя: *$capacity*
+                           |Год выпуска: *$prodYear*
                            |
-                           |*Описание:* $desc
+                           |Стоимость автомобиля: *$price*
+                           |Таможенные расходы: *$customExp*
+                           |Утилизационный сбор: *$utilFee*
+                           |Затраты по РФ (таможенный брокер, ЭПТС, СБКТС, СВХ, ППР): *$addExp*
+                           |
+                           |Итого: *$total*
+                           |
+                           |_${desc}_
+                           |
+                           |*$phone*
+                           |
+                           |$addInfo
                          """.stripMargin
-                      ),
-                      parseMode = Option(Markdown)
+                        ),
+                        parseMode = Option(Markdown)
+                      )
                     )
-                  )
-                } yield ()
+                  } yield ()
               }
             )
             .fork

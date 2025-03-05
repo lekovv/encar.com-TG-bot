@@ -10,7 +10,13 @@ case class CarPrice(
     capacity: String,
     prodYear: String,
     price: String,
-    desc: String
+    customExp: String,
+    utilFee: String,
+    addExp: String,
+    total: String,
+    desc: String,
+    phone: String,
+    addInfo: String
 )
 
 object CarPrice {
