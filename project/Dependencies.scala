@@ -5,7 +5,6 @@ object Dependencies {
   object Version {
     val scala        = "2.13.10"
     val zio          = "2.1.15"
-    val zioHttp      = "3.0.1"
     val zioConfig    = "4.0.3"
     val sl4j         = "2.0.16"
     val zioLogging   = "2.3.1"
@@ -44,8 +43,7 @@ object Dependencies {
   }
 
   object HTTP {
-    lazy val zhttp = "dev.zio"                       %% "zio-http"                      % Version.zioHttp
-    lazy val sttp  = "com.softwaremill.sttp.client3" %% "async-http-client-backend-zio" % Version.sttp
+    lazy val sttp = "com.softwaremill.sttp.client3" %% "async-http-client-backend-zio" % Version.sttp
   }
 
   object SELENIUM {
@@ -77,7 +75,6 @@ object Dependencies {
     LOGS.zioLoggingLf4j,
     LOGS.zioLogging,
     LOGS.sl4j,
-    HTTP.zhttp,
     HTTP.sttp,
     SELENIUM.core,
     SELENIUM.driver,
