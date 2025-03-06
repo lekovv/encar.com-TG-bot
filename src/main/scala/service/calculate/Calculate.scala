@@ -1,7 +1,9 @@
 package service.calculate
 
 import models.{CarInfo, CarPrice}
-import zio.Task
+import service.exchage.ExchangeRateAPI
+import service.parser.Parser
+import zio.{Task, ZLayer}
 import zio.macros.accessible
 
 @accessible
@@ -11,5 +13,5 @@ trait Calculate {
 }
 
 object Calculate {
-  val live = CalculateLive.layer
+  val live: ZLayer[ExchangeRateAPI with Parser, Nothing, CalculateLive] = CalculateLive.layer
 }

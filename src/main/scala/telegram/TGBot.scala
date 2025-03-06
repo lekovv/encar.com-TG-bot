@@ -1,7 +1,8 @@
 package telegram
 
 import config.ConfigApp
-import zio.RIO
+import telegram.scenario.TGScenario
+import zio.{RIO, ZLayer}
 import zio.macros.accessible
 
 @accessible
@@ -11,5 +12,5 @@ trait TGBot {
 }
 
 object TGBot {
-  val live = TGBotLive.layer
+  val live: ZLayer[TGScenario[TGBotClient] with TGBotClient, Nothing, TGBotLive] = TGBotLive.layer
 }

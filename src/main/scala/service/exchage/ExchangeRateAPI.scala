@@ -1,6 +1,7 @@
 package service.exchage
 
-import zio.Task
+import config.ConfigApp
+import zio.{Task, ZLayer}
 import zio.macros.accessible
 
 @accessible
@@ -10,5 +11,5 @@ trait ExchangeRateAPI {
 }
 
 object ExchangeRateAPI {
-  val live = ExchangeRateAPILive.layer
+  val live: ZLayer[ConfigApp, Nothing, ExchangeRateAPILive] = ExchangeRateAPILive.layer
 }

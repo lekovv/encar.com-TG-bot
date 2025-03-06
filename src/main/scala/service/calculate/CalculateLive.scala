@@ -68,7 +68,7 @@ final case class CalculateLive(parser: Parser, exchange: ExchangeRateAPI) extend
 }
 
 object CalculateLive {
-  val layer = ZLayer.fromZIO {
+  val layer: ZLayer[ExchangeRateAPI with Parser, Nothing, CalculateLive] = ZLayer.fromZIO {
     for {
       parser   <- ZIO.service[Parser]
       exchange <- ZIO.service[ExchangeRateAPI]

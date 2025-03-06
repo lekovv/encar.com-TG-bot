@@ -111,7 +111,7 @@ final case class TGScenarioLive(calc: Calculate) extends TGScenario[TGBotClient]
 }
 
 object TGScenarioLive {
-  val layer = ZLayer.fromZIO {
+  val layer: ZLayer[Calculate, Nothing, TGScenarioLive] = ZLayer.fromZIO {
     for {
       calc <- ZIO.service[Calculate]
     } yield TGScenarioLive(calc)

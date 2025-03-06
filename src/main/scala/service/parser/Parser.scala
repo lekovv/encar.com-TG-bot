@@ -1,7 +1,7 @@
 package service.parser
 
 import models.CarInfo
-import zio.Task
+import zio.{Task, ZLayer}
 import zio.macros.accessible
 
 @accessible
@@ -11,5 +11,5 @@ trait Parser {
 }
 
 object Parser {
-  val live = ParserLive.layer
+  val live: ZLayer[Any, Nothing, ParserLive] = ParserLive.layer
 }

@@ -1,7 +1,8 @@
 package telegram.scenario
 
 import com.bot4s.telegram.api.BotBase
-import zio.Task
+import service.calculate.Calculate
+import zio.{Task, ZLayer}
 import zio.macros.accessible
 
 @accessible
@@ -11,5 +12,5 @@ trait TGScenario[Bot <: BotBase[Task]] {
 }
 
 object TGScenario {
-  val live = TGScenarioLive.layer
+  val live: ZLayer[Calculate, Nothing, TGScenarioLive] = TGScenarioLive.layer
 }
