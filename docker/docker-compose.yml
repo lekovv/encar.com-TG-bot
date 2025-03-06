@@ -16,6 +16,9 @@ services:
   selenium-standalone-chromium:
     image: selenium/standalone-chromium:latest
     container_name: selenium-standalone-chromium
+    environment:
+      - SE_NODE_MAX_SESSIONS=8
+      - SE_NODE_SESSION_TIMEOUT=60
     ports:
       - "4444:4444"
     networks:

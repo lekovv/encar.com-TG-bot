@@ -24,6 +24,7 @@ final case class ParserLive() extends Parser {
     options.addArguments("--disable-infobars")
     options.addArguments("--disable-gpu")
     options.addArguments("--disable-dev-shm-usage")
+    options.addArguments("--disable-images")
 
     val driver: RemoteWebDriver = new RemoteWebDriver(gridUrl, options)
 
